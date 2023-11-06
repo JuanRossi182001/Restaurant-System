@@ -33,9 +33,9 @@ async def get(db: Session =Depends(get_db)):
 
 
 # get product by id end point 
-@router.get("/product/{id}")
-async def get_by_id(db: Session=Depends(get_db)):
-    _product = get_product_by_id(db,id)
+@router.get("/product/{product_id}")
+async def get_by_id( product_id:int, db: Session=Depends(get_db)):
+    _product = get_product_by_id(db,product_id)
     return Response(code="200",status="OK",message="Succes get data",result=_product).dict(exclude_none=True)
 
 
