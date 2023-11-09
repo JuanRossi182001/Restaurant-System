@@ -4,22 +4,25 @@ from pydantic.generics import GenericModel
 
 T = TypeVar('T')
 
-class ProductSchema(BaseModel):
-    name:Optional[str]=None
-    description: Optional[str]=None
-    price: Optional[float]=None
+class TableSchema(BaseModel):
+    number:Optional[int]=None
+    capacity: Optional[int]=None
+    state: Optional[str]=None
     
     class Config:
         orm_mode=True
         
         
         
-class RequestProduct(BaseModel):
-    parameter: ProductSchema = Field(...)
+class RequestTable(BaseModel):
+    parameter: TableSchema = Field(...)
+    
+
     
 class Response(GenericModel, Generic[T]):
     code: str
     status: str
     message: str
     result: Optional[T]
+    
     

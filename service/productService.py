@@ -6,6 +6,7 @@ from schemas.productSchema import ProductSchema
 # get all products
 def get_products(db:Session):
     return db.query(Product).all()
+    
 
 
 # get product by id 
@@ -20,6 +21,7 @@ def create_product(db: Session,product: ProductSchema):
     db.commit()
     db.refresh(_product)
     return _product.as_dict()
+
 
 # delete product by id 
 def delete_product(db: Session, product_id: int):

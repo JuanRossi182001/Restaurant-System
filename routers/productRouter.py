@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends,HTTPException
 from config.config import sessionLocal
 from sqlalchemy.orm import Session
-from schemas.productSchema import ProductSchema,RequestProduct,Response
+from schemas.productSchema import RequestProduct,Response
 from service.productService import create_product,delete_product,get_product_by_id,get_products,update_product
 
 
@@ -36,13 +36,15 @@ async def get(db: Session =Depends(get_db)):
 @router.get("/product/{product_id}")
 async def get_by_id( product_id:int, db: Session=Depends(get_db)):
     _product = get_product_by_id(db,product_id)
+    if not _product:
+        raise HTTPException(status_code=404,detail="Fail to get data, product not found")
     return Response(code="200",status="OK",message="Succes get data",result=_product).dict(exclude_none=True)
 
 
 # update product end point 
-@router.patch("/product/update")
-async def update_productt(request: RequestProduct, db: Session =Depends(get_db)):
-    _product = update_product(db,product_id=request.parameter.id,
+@router.patch("/product/update/{product_id}")
+async def update_productt(product_id: int ,request: RequestProduct, db: Session =Depends(get_db)):
+    _product = update_product(db,product_id=product_id,
                               name=request.parameter.name,description=request.parameter.description,
                               price=request.parameter.price)
     return Response(code="200",status="OK",message ="Succes update data", result =_product)
