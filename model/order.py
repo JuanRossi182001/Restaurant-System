@@ -11,7 +11,7 @@ class Order(base):
     order_number = Column(Integer)
     total = Column(Float)
     state = Column(String)
-    assigned_table = Column(Integer, ForeignKey('Tables.id'))
+    assigned_table = Column(Integer, ForeignKey('Tables.number'))
     products = relationship("Product", secondary="order_product")
     assigned_waiter = Column(Integer, ForeignKey('Waiters.id'))
     

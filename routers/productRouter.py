@@ -17,9 +17,9 @@ def get_db():
 
 # create product end point    
 @router.post("/product/create")
-async def create(request: RequestProduct, db: Session = Depends(get_db)):
+async def create(request: RequestProduct, db: Session = Depends((get_db))):
     try:
-        create_product(db,product=request.parameter)
+        create_product(db=db,product=request.parameter)
         return Response(code="200", status="OK",message="Product created Successfully", result=None).dict(exclude_none=True)
     except Exception as e:
         return Response(code="500", status="Internal Server Error", message=str(e), result=None).dict(exclude_none=True)
@@ -34,7 +34,7 @@ async def get(db: Session =Depends(get_db)):
 
 # get product by id end point 
 @router.get("/product/{product_id}")
-async def get_by_id( product_id:int, db: Session=Depends(get_db)):
+async def get_by_id( product_id:int, db: Session=Depends((get_db))):
     _product = get_product_by_id(db,product_id)
     if not _product:
         raise HTTPException(status_code=404,detail="Fail to get data, product not found")
@@ -43,7 +43,7 @@ async def get_by_id( product_id:int, db: Session=Depends(get_db)):
 
 # update product end point 
 @router.patch("/product/update/{product_id}")
-async def update_productt(product_id: int ,request: RequestProduct, db: Session =Depends(get_db)):
+async def update_productt(product_id: int ,request: RequestProduct, db: Session = Depends(get_db)):
     _product = update_product(db,product_id=product_id,
                               name=request.parameter.name,description=request.parameter.description,
                               price=request.parameter.price)
@@ -51,9 +51,9 @@ async def update_productt(product_id: int ,request: RequestProduct, db: Session 
     
 
 # delete product end point
-@router.delete("/product/delete/{id}")
-async def product_delete(id: int, db: Session=Depends(get_db)):
-    delete_product(db,product_id=id)
+@router.delete("/product/delete/{product_id}")
+async def product_delete(product_id: int, db: Session=Depends((get_db))):
+    delete_product(db,product_id=product_id)
     return Response(code="200", status="OK", message="Succes delete data", result={})
     
 
