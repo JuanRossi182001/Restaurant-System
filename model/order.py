@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 
 
+
 class Order(base):
     __tablename__ ="Orders"
     
@@ -29,6 +30,14 @@ class Order(base):
             'Products': self.products,
             'Assigned_Waiter': self.assigned_waiter
         }
+        
+        
+    def calculate_total(self):
+        total = 0.0
+        for Product in self.products:
+            total += Product.price
+        return total
+        
     
     
     
@@ -80,3 +89,5 @@ class Order(base):
         self._assigned_waiter = value
 
 
+
+    

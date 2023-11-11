@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends,HTTPException
 from config.config import sessionLocal
 from sqlalchemy.orm import Session
 from schemas.orderSchema import RequestOrder,Response
-from service.orderService import get_order_by_id,get_orders,create_order,delete_order,update_order
+from service.orderService import get_order_by_id,get_orders,create_order,delete_order,update_order,get_closed_orders,get_open_orders
 
 
 router = APIRouter()
@@ -33,6 +33,19 @@ async def get(db: Session = Depends((get_db))):
     return Response(code="200", status="OK",message="succes fetch all data",result=_orders).dict(exclude_none=True)
 
 
+# get open orders end point 
+@router.get("/order/open")
+async def get_open(db: Session = Depends(get_db)):
+    _orders = get_open_orders(db=db)
+    return Response(code="200", status="OK",message="succes fetch all data",result=_orders).dict(exclude_none=True)
+
+
+# get closed orders end point 
+@router.get("/order/closed")
+async def get_closed(db: Session = Depends(get_db)):
+    _orders = get_closed_orders(db=db)
+    return Response(code="200", status="OK",message="succes fetch all data",result=_orders).dict(exclude_none=True)
+
 
 # get order by id end point
 @router.get("/order/{order_id}")
@@ -41,7 +54,6 @@ async def get_by_id(order_id: int, db: Session = Depends((get_db))):
     if not _order:
         raise HTTPException(status_code=404,detail="Fail to get data, order not found")
     return Response(code="200",status="OK",message="Succes get data",result=_order).dict(exclude_none=True)
-
 
 
 # update order end point

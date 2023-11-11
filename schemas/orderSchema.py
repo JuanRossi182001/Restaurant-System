@@ -8,7 +8,7 @@ T = TypeVar('T')
 
 class OrderSchema(BaseModel):
     order_number: Optional[int]=None
-    total: Optional[Float]=None
+    total: Optional[float]=None
     state: Optional[str]=None
     assigned_table: Optional[int]=None
     assigned_waiter: Optional[int]=None

@@ -7,6 +7,14 @@ from schemas.orderSchema import OrderSchema
 def get_orders(db: Session):
     return db.query(Order).all()
 
+# get open orders
+def get_open_orders(db: Session):
+    return db.query(Order).filter(Order.state == "open").all()
+
+# get closed orders
+def get_closed_orders(db: Session):
+    return db.query(Order).filter(Order.state == "closed").all()
+
 
 # get order by id
 def get_order_by_id(db: Session,order_id: int):
@@ -17,6 +25,7 @@ def get_order_by_id(db: Session,order_id: int):
 def create_order(db: Session,order: OrderSchema):
     _order = Order(order_number=order.order_number,total=order.total,
                    state=order.state,assigned_table=order.assigned_table,assigned_waiter=order.assigned_waiter)
+    _order.total=_order.calculate_total()
     db.add(_order)
     db.commit()
     db.refresh(_order)
@@ -37,7 +46,9 @@ def update_order(db: Session,order_id: int,order_number: int,total: int,state: s
     _order.state = state
     _order.assigned_table = assigned_table
     _order.assigned_waiter = assigned_waiter
+    _order.total = _order.calculate_total()
     db.commit()
     db.refresh(_order)
     return _order.as_dict()
+    
     

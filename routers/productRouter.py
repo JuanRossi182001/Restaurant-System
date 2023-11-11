@@ -41,6 +41,7 @@ async def get_by_id( product_id:int, db: Session=Depends((get_db))):
     return Response(code="200",status="OK",message="Succes get data",result=_product).dict(exclude_none=True)
 
 
+
 # update product end point 
 @router.patch("/product/update/{product_id}")
 async def update_productt(product_id: int ,request: RequestProduct, db: Session = Depends(get_db)):
@@ -50,14 +51,10 @@ async def update_productt(product_id: int ,request: RequestProduct, db: Session 
     return Response(code="200",status="OK",message ="Succes update data", result =_product)
     
 
+
 # delete product end point
 @router.delete("/product/delete/{product_id}")
 async def product_delete(product_id: int, db: Session=Depends((get_db))):
     delete_product(db,product_id=product_id)
     return Response(code="200", status="OK", message="Succes delete data", result={})
     
-
-
-        
-        
-        
