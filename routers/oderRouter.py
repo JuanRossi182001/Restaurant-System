@@ -22,6 +22,7 @@ async def create(request: RequestOrder, db: Session = Depends((get_db))):
     try:
         create_order(db=db,order=request.parameter)
         return Response(code="200", status="OK",message="Order created Successfully", result=None).dict(exclude_none=True)
+     # DUDA, PODRE CREAR UN OBJETO ORDER COMO EN LOS GET PARA AGREGARLO AL RESULT?
     except Exception as e:
         return Response(code="500", status="Internal Server Error", message=str(e), result=None).dict(exclude_none=True)
     

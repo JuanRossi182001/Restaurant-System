@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table,Float
+from sqlite3 import Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Table,Float,DateTime
 from config.config import base
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 
 
@@ -15,6 +17,7 @@ class Order(base):
     assigned_table = Column(Integer, ForeignKey('Tables.number'))
     products = relationship("Product", secondary="order_product")
     assigned_waiter = Column(Integer, ForeignKey('Waiters.id'))
+    hour = Column(DateTime)
     
     order_product = Table('order_product', base.metadata,Column('order_id',Integer, ForeignKey('Orders.id')),
                           Column('Product_id',Integer, ForeignKey('Products.id')))

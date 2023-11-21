@@ -12,9 +12,8 @@ app.include_router(waiterRouter.router)
 app.include_router(oderRouter.router)
 
 product.base.metadata.create_all(bind=engine)
-order.base.metadata.create_all(bind=engine)
 table.base.metadata.create_all(bind=engine)
 waiter.base.metadata.create_all(bind=engine)
-
+order.base.metadata.create_all(bind=engine)
 
 
