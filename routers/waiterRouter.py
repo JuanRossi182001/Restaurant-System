@@ -2,7 +2,7 @@ from fastapi import APIRouter,HTTPException,Depends
 from config.config import sessionLocal
 from sqlalchemy.orm import Session
 from schemas.waiterSchema import RequestWaiter,Response
-from service.WaiterService import get_waiter_by_id,get_waiters,create_waiter,update_waiter,delete_waiter_by_id
+from service.WaiterService import get_waiter_by_id,get_waiters,create_waiter,update_waiter,delete_waiter_by_id,authenticate_user
 
 
 router = APIRouter()
@@ -47,14 +47,25 @@ async def get_by_id(waiter_id: int, db: Session = Depends((get_db))):
 async def waiter_update(waiter_id: int, request: RequestWaiter, db: Session = Depends((get_db))):
     _waiter = update_waiter(db=db,waiter_id=waiter_id,username=request.parameter.username,
                             password=request.parameter.password)
-    return Response(code="200",status="OK",message ="Succes update data", result =_waiter)
+    return Response(code="200",status="OK",message ="Succes update data", result =_waiter).dict(exclude_none = True)
 
 # delete waiter end point 
 @router.delete("/waiter/delete/{waiter_id}")
 async def delete (waiter_id: int, db: Session = Depends((get_db))):
     delete_waiter_by_id(waiter_id=waiter_id,db=db)
-    return Response(code="200", status="OK", message="Succes delete data", result={})
+    return Response(code="200", status="OK", message="Succes delete data", result={}).dict(exclude_none = True)
     
     
-   
+    
+# authenticate waiter
+@router.post ("/waiter/auth")
+async def auth (request: RequestWaiter, db: Session = Depends((get_db))):
+    try:
+        _waiter = authenticate_user(waiterr=request.parameter,db=db)
+        if not _waiter:
+            raise HTTPException(status_code=401,detail="fail to athenticate")
+        return Response(code="200", status="OK", message="successfully authenticated", result=_waiter).dict(exclude_none = True)
+    except:
+        raise HTTPException(status_code=500,detail="fatal error")
+        
     

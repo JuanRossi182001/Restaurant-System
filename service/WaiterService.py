@@ -3,6 +3,12 @@ from schemas.waiterSchema import WaiterSchema
 from model.waiter import Waiter
 from fastapi import HTTPException
 from sqlalchemy.orm.exc import NoResultFound
+from passlib.context import CryptContext
+
+
+bycrypt_context = CryptContext(schemes=['bcrypt'], deprecated ='auto')
+
+
 
 # get all waiters
 def get_waiters(db: Session):
@@ -18,7 +24,7 @@ def get_waiter_by_id(waiter_id: int, db: Session):
 
 # create a new waiter 
 def create_waiter(db: Session,waiter: WaiterSchema):
-    _Waiter = Waiter(username = waiter.username,password=waiter.password)
+    _Waiter = Waiter(username = waiter.username,password=bycrypt_context.hash(waiter.password))
     db.add(_Waiter)
     db.commit()
     db.refresh(_Waiter)
@@ -46,5 +52,16 @@ def update_waiter(db: Session, waiter_id: int, username: str, password: str):
         return _waiter.as_dict()
     except:
         raise HTTPException(status_code=422,detail="Unprocessable Entity")  
+
+
+
+# authenticate waiter
+def authenticate_user(waiterr: WaiterSchema,db: Session):
+    _waiter = db.query(Waiter).filter(Waiter.username == waiterr.username).first()
+    if not _waiter:
+        return False
+    if not bycrypt_context.verify(waiterr.password, _waiter.password):
+        return False
+    return _waiter
 
 
