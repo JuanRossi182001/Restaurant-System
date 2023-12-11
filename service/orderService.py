@@ -7,6 +7,9 @@ from model.product import Product
 from sqlalchemy.orm.exc import NoResultFound
 
 
+
+
+
 # get all orders
 def get_orders(db: Session):
     return db.query(Order).all()
@@ -29,22 +32,24 @@ def get_order_by_id(db: Session,order_id: int):
     except:
         raise HTTPException(status_code=404,detail="Error, Order not found")
     
+
     
 # create a new order
-def create_order(db: Session,order: OrderSchema):
-  # Obtener instancias reales de productos usando sus IDs
- order_products = db.query(Product).filter(Product.id.in_(order.products)).all() if order.products else []
- 
- _order = Order(order_number=order.order_number,total=order.total,
-                   state=order.state,assigned_table=order.assigned_table,assigned_waiter=order.assigned_waiter,
-                     products = order_products,hour=order.hour)    
- current_time = datetime.utcnow()
- order.hour = current_time
- _order.total=_order.calculate_total()
- db.add(_order)
- db.commit()
- db.refresh(_order)
- return _order.as_dict()
+def create_order(db: Session,order: OrderSchema,waiter_id:int):
+    products_list = []
+    for product in order.products:
+        p = db.query(Product).filter(Product.id == product).first()
+        products_list.append(p)
+    _order = Order(order_number=order.order_number,total=order.total,
+                    state=order.state,assigned_table=order.assigned_table,assigned_waiter=waiter_id,
+                        products = products_list,hour=order.hour)    
+    current_time = datetime.utcnow()
+    order.hour = current_time
+    _order.total=_order.calculate_total()
+    db.add(_order)
+    db.commit()
+    db.refresh(_order)
+    return _order.as_dict()
 
 
 # delete order by id

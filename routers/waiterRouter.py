@@ -1,8 +1,12 @@
+from datetime import timedelta
 from fastapi import APIRouter,HTTPException,Depends
 from config.config import sessionLocal
 from sqlalchemy.orm import Session
 from schemas.waiterSchema import RequestWaiter,Response
-from service.WaiterService import get_waiter_by_id,get_waiters,create_waiter,update_waiter,delete_waiter_by_id,authenticate_user
+from service.WaiterService import authenticate_user_2, get_waiter_by_id,get_waiters,create_waiter,update_waiter,delete_waiter_by_id,authenticate_user,create_token
+from model.token import Token
+from typing import Annotated
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm 
 
 
 router = APIRouter()
@@ -68,4 +72,16 @@ async def auth (request: RequestWaiter, db: Session = Depends((get_db))):
     except:
         raise HTTPException(status_code=500,detail="fatal error")
         
+        
+        
+@router.post("/token",response_model=Token)
+async def login_for_token(form_data:  Annotated[OAuth2PasswordRequestForm,Depends()],db: Session = Depends((get_db))):
+    waiter = authenticate_user_2(form_data.username,form_data.password,db=db)
+    if not waiter:
+        raise HTTPException(status_code=401,detail="Could not validate Waiter")
+    
+    token = create_token(waiter.username,waiter.id,timedelta(minutes=10))
+    
+    return {'access_token': token, 'token_type': 'bearer'}
+    
     

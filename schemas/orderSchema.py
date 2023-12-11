@@ -4,7 +4,7 @@ from typing import Optional,Generic,TypeVar,List
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from schemas.productSchema import ProductSchema
-
+from model.product import Product
 
 
 T = TypeVar('T')
@@ -20,9 +20,8 @@ class OrderSchema(BaseModel):
     
 
     
-    
     class Config:
-        orm_mode=True
+        from_attributes=True
         
         
         

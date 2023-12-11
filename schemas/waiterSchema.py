@@ -5,6 +5,7 @@ from pydantic.generics import GenericModel
 T = TypeVar('T')
 
 class WaiterSchema(BaseModel):
+    id:Optional[int]=None
     username:Optional[str]=None
     password: Optional[str]=None
     

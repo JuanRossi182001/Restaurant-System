@@ -1,12 +1,18 @@
+from datetime import timedelta,datetime
 from sqlalchemy.orm import Session
 from schemas.waiterSchema import WaiterSchema
 from model.waiter import Waiter
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm.exc import NoResultFound
 from passlib.context import CryptContext
+from jose import jwt,JWTError
+from fastapi.security import OAuth2PasswordBearer
+from typing import Annotated
 
-
+SECRET_KEY = '4a4e0a14fb014a0abbbd4fb72c8dfd72'
+ALGORITH = 'HS256'
 bycrypt_context = CryptContext(schemes=['bcrypt'], deprecated ='auto')
+oauth_bearer = OAuth2PasswordBearer(tokenUrl='/token')
 
 
 
@@ -64,4 +70,32 @@ def authenticate_user(waiterr: WaiterSchema,db: Session):
         return False
     return _waiter
 
+# create token 
+def create_token(username: str, waiter_id: int, expires_delta: timedelta):
+    encode = {'sub': username,'id': waiter_id}
+    expires = datetime.utcnow() + expires_delta
+    encode.update({'exp':expires})
+    return jwt.encode(encode,SECRET_KEY,algorithm=ALGORITH)
+
+# get current waiter
+async def get_current_waiter(token: Annotated[str,Depends(oauth_bearer)]):
+    try:
+        payload = jwt.decode(token,SECRET_KEY)
+        username: str = payload.get('sub')
+        waiter_id: int = payload.get('id')
+        if username is None or waiter_id is None:
+            raise HTTPException(status_code=401,
+                                detail="Could not validate Waiter")
+        return{'username': username, 'id': waiter_id}
+    except JWTError:
+        raise HTTPException(status_code=401,detail="Could not validate Waiter")
+
+
+def authenticate_user_2(username: str, password: str,db: Session):
+    _waiter = db.query(Waiter).filter(Waiter.username == username).first()
+    if not _waiter:
+        return False
+    if not bycrypt_context.verify(password, _waiter.password):
+        return False
+    return _waiter
 

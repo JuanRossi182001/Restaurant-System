@@ -4,6 +4,7 @@ from model import order,product,table,waiter
 from config.config import engine
 from routers import productRouter, waiterRouter,tableRouter, oderRouter
 
+
 app=FastAPI()
 
 app.include_router(productRouter.router)

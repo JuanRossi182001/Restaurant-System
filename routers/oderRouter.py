@@ -1,12 +1,12 @@
-from tkinter import SE
-from fastapi import APIRouter, Depends,HTTPException
+from fastapi import APIRouter, Depends,HTTPException,Header
 from config.config import sessionLocal
 from sqlalchemy.orm import Session
 from schemas.orderSchema import RequestOrder,Response
 from service.orderService import get_order_by_id,get_orders,create_order,delete_order,update_order,get_closed_orders,get_open_orders
-
-
+from service.WaiterService import get_current_waiter
+from typing import Annotated
 router = APIRouter()
+waiter_dependency = Annotated[dict,Depends(get_current_waiter)]
 
 def get_db():
     db = sessionLocal()
@@ -17,12 +17,15 @@ def get_db():
         
         
 # create order end point
+# DUDA, PODRE CREAR UN OBJETO ORDER COMO EN LOS GET PARA AGREGARLO AL RESULT?
+ # TENGO QUE SOLUCIONAR Q CUANDO NECESITO PONER DOS PRODUCTOS IGUALES EN EL TOTAL NO ME LOS SUMA 
 @router.post("/order/create")
-async def create(request: RequestOrder, db: Session = Depends((get_db))):
+async def create(waiter:waiter_dependency,request: RequestOrder, db: Session = Depends((get_db))):
     try:
-        create_order(db=db,order=request.parameter)
+        if not waiter:
+            raise HTTPException(status_code=401,detail="auth fail")
+        create_order(db=db,order=request.parameter,waiter_id=waiter["id"])
         return Response(code="200", status="OK",message="Order created Successfully", result=None).dict(exclude_none=True)
-     # DUDA, PODRE CREAR UN OBJETO ORDER COMO EN LOS GET PARA AGREGARLO AL RESULT?
     except Exception as e:
         return Response(code="500", status="Internal Server Error", message=str(e), result=None).dict(exclude_none=True)
     

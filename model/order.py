@@ -1,11 +1,10 @@
 from sqlite3 import Date
 from sqlalchemy import Column, Integer, String, ForeignKey, Table,Float,DateTime
 from config.config import base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from datetime import datetime
-
-
-
+from.product import Product
+from typing import List
 
 class Order(base):
     __tablename__ ="Orders"
@@ -15,7 +14,7 @@ class Order(base):
     total = Column(Float)
     state = Column(String)
     assigned_table = Column(Integer, ForeignKey('Tables.number'))
-    products = relationship("Product", secondary="order_product")
+    products: Mapped[List[Product]]  = relationship("Product", secondary="order_product")
     assigned_waiter = Column(Integer, ForeignKey('Waiters.id'))
     hour = Column(DateTime)
     
@@ -25,13 +24,12 @@ class Order(base):
     
     def as_dict(self):
         return {
-            'id': self.id,
-            'Order_number': self.order_number,
-            'Total': self.total,
-            'State': self.state,
-            'Assigned_Table': self.assigned_table,
-            'Products': self.products,
-            'Assigned_Waiter': self.assigned_waiter
+            'order_number': self.order_number,
+            'total': self.total,
+            'state': self.state,
+            'assigned_Table': self.assigned_table,
+            'products': self.products,
+            'assigned_Waiter': self.assigned_waiter
         }
         
         
@@ -41,7 +39,6 @@ class Order(base):
             total += Product.price
         return total
         
-    
     
     
  # Getter para el número de pedido
