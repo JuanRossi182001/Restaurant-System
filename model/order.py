@@ -1,8 +1,6 @@
-from sqlite3 import Date
 from sqlalchemy import Column, Integer, String, ForeignKey, Table,Float,DateTime
 from config.config import base
 from sqlalchemy.orm import relationship, Mapped
-from datetime import datetime
 from.product import Product
 from typing import List
 

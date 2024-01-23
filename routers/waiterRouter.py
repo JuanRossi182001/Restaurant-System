@@ -6,7 +6,7 @@ from schemas.waiterSchema import RequestWaiter,Response
 from service.WaiterService import authenticate_user_2, get_waiter_by_id,get_waiters,create_waiter,update_waiter,delete_waiter_by_id,authenticate_user,create_token
 from model.token import Token
 from typing import Annotated
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm 
+from fastapi.security import  OAuth2PasswordRequestForm 
 
 
 router = APIRouter()
